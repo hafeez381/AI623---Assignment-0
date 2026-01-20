@@ -1,3 +1,5 @@
+import torch
+from tqdm import tqdm
 
 def train_one_epoch(model, loader, criterion, optimizer, DEVICE):
     model.train()
