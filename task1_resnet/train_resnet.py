@@ -1,10 +1,12 @@
 import numpy as np
 import random
+import json
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torchvision import datasets, models
 from torch.utils.data import DataLoader, random_split
+from utils import train_one_epoch, evaluate
 
 torch.manual_seed(42)
 np.random.seed(42)
@@ -46,4 +48,28 @@ test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False, num_workers
 # Loss and Optimizer
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(resnet_model.fc.parameters(), lr=0.001)
+num_epochs = 6
 
+history = {
+    'train_loss': [], 'train_acc': [],
+    'val_loss': [], 'val_acc': []
+}
+
+for epoch in range(num_epochs):
+    train_loss, train_acc = train_one_epoch(resnet_model, train_loader, criterion, optimizer, DEVICE)
+    val_loss, val_acc = evaluate(resnet_model, val_loader, criterion, DEVICE)
+
+    history['train_loss'].append(train_loss)
+    history['train_acc'].append(train_acc)
+    history['val_loss'].append(val_loss)
+    history['val_acc'].append(val_acc)
+
+    print(f"Epoch {epoch+1}/{num_epochs} Complete")
+
+# Save history
+with open('task1_training_metrics.json', 'w') as f:
+        json.dump(history, f)
+
+# Save model weights
+torch.save(resnet_model.state_dict(), "resnet152_frozen_cifar10.pth")
+print("\nTraining complete. Model and history saved.")
