@@ -1,7 +1,7 @@
-import numpy as np
 import random
 import json
 import torch
+import numpy as np
 import torch.nn as nn
 import torch.optim as optim
 from torchvision import datasets, models
@@ -9,8 +9,8 @@ from torch.utils.data import DataLoader, random_split
 from utils import train_one_epoch, evaluate
 
 torch.manual_seed(42)
-np.random.seed(42)
 random.seed(42)
+np.random.seed(42)
 
 # Device configuration
 # DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
