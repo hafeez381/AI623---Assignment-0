@@ -51,7 +51,7 @@ def main():
     # Loss and Optimizer
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(resnet_model.fc.parameters(), lr=0.001)
-    num_epochs = 6
+    num_epochs = 5
 
     # Metrics storage
     history = {
