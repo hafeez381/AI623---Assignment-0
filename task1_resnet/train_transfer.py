@@ -102,8 +102,8 @@ def main():
     full_train = datasets.CIFAR10(root='./data', train=True, download=True, transform=preprocess)
     train_data, val_data = random_split(full_train, [45000, 5000], generator=torch.Generator().manual_seed(42))
     
-    train_loader = DataLoader(train_data, batch_size=64, shuffle=True, num_workers=2)
-    val_loader = DataLoader(val_data, batch_size=64, shuffle=False, num_workers=2)
+    train_loader = DataLoader(train_data, batch_size=32, shuffle=True, num_workers=2)
+    val_loader = DataLoader(val_data, batch_size=32, shuffle=False, num_workers=2)
 
     # Model Setup
     model, lr = get_model(args.mode, num_classes=10)
