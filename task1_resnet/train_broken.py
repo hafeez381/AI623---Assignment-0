@@ -1,5 +1,5 @@
 """
-Task 1.2: Train ResNet-152 with disabled skip connections.
+Task 1.2: Train ResNet-152 with disabled skip connections
 Run: python train_broken.py
 Saves: results/broken_metrics.json
 """
