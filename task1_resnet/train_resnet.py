@@ -1,5 +1,5 @@
 """
-Task 1.1: Baseline - Train ResNet-152 with frozen backbone on CIFAR-10.
+Task 1.1: Baseline - Train ResNet-152 with frozen backbone on CIFAR-10
 Run: python train_resnet.py
 Saves: results/baseline_metrics.json, checkpoints/resnet_frozen.pth
 """
