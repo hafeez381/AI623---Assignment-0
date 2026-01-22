@@ -1,9 +1,9 @@
 """
-Task 1.4: Transfer Learning - The All-in-One Script
+Task 1.4: Transfer Learning
 Handles 3 modes via command line args:
-  1. --mode random    : Random Init (Task 1.4b) - Trains FULL network from scratch
-  2. --mode full      : Full Fine-tuning (Task 1.4c) - Trains FULL network from ImageNet weights
-  3. --mode lastblock : Last Block Fine-tuning (Task 1.4c) - Trains only last block + FC
+  1. --mode random    : Random Init - Trains FULL network from scratch
+  2. --mode full      : Full Fine-tuning - Trains FULL network from ImageNet weights
+  3. --mode lastblock : Last Block Fine-tuning - Trains only last block + FC
 
 Run examples:
   python train_transfer.py --mode random
@@ -33,47 +33,35 @@ def get_model(mode, num_classes=10):
     - full: Pretrained, TRAIN EVERYTHING (lower LR).
     - lastblock: Pretrained, only layer4 + FC unfrozen.
     """
-    # Note: We use 10 classes for CIFAR-10 consistency
-    
     if mode == 'random':
         print("Configuring: Random Initialization (Training from Scratch)...")
-        # 1. Load Architecture only (No Weights)
         model = models.resnet152(weights=None)
         for p in model.parameters():
             p.requires_grad = True
-            
         model.fc = nn.Linear(2048, num_classes)
         lr = 0.0001
         
     elif mode == 'full':
         print("Configuring: Full Fine-Tuning (ImageNet Weights)...")
-        # 2. Load ImageNet Weights
         weights = models.ResNet152_Weights.IMAGENET1K_V2
         model = models.resnet152(weights=weights)
-        
-        # Unfreeze Everything
         for p in model.parameters():
             p.requires_grad = True
-            
         model.fc = nn.Linear(2048, num_classes)
         lr = 0.0001
         
     elif mode == 'lastblock':
         print("Configuring: Last Block Fine-Tuning...")
-        # 3. Load ImageNet Weights
         weights = models.ResNet152_Weights.IMAGENET1K_V2
         model = models.resnet152(weights=weights)
-        
-        # Freeze Layers 1-3, Unfreeze Layer 4 + FC
         for name, p in model.named_parameters():
             if 'layer4' in name or 'fc' in name:
                 p.requires_grad = True
             else:
                 p.requires_grad = False
-                
         model.fc = nn.Linear(2048, num_classes)
         lr = 0.0001
-        
+    
     else:
         raise ValueError(f"Unknown mode: {mode}")
     
@@ -124,7 +112,7 @@ def main():
         history['train_acc'].append(train_acc)
         history['val_loss'].append(val_loss)
         history['val_acc'].append(val_acc)
-        print(f"Epoch {epoch+1}/{args.epochs} - Val Acc: {val_acc:.2f}%")
+        print(f"Epoch {epoch+1}/{args.epochs}")
 
     # Save results
     os.makedirs('results', exist_ok=True)
@@ -133,8 +121,6 @@ def main():
         json.dump(history, f)
     
     print(f"\nTraining complete. Results saved to {output_file}")
-    print(f"Final Val Accuracy: {history['val_acc'][-1]:.2f}%")
-
 
 if __name__ == '__main__':
     main()
