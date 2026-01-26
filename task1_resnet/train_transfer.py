@@ -21,9 +21,10 @@ import torch
 import numpy as np
 import torch.nn as nn
 import torch.optim as optim
-from torchvision import datasets, models
-from torch.utils.data import DataLoader, random_split
-from utils import train_one_epoch, evaluate
+from torchvision import datasets, models, transforms
+from torch.utils.data import DataLoader, random_split, Subset
+from utils_update import train_one_epoch, evaluate
+from sklearn.model_selection import train_test_split
 
 
 def get_model(mode, num_classes=10):
@@ -34,33 +35,39 @@ def get_model(mode, num_classes=10):
     - lastblock: Pretrained, only layer4 + FC unfrozen.
     """
     if mode == 'random':
-        print("Configuring: Random Initialization (Training from Scratch)...")
+        print("Random Init: Training full ResNet-152 from scratch")
         model = models.resnet152(weights=None)
+        model.fc = nn.Linear(2048, num_classes)
+
+        # Enable all gradients
         for p in model.parameters():
             p.requires_grad = True
-        model.fc = nn.Linear(2048, num_classes)
-        lr = 0.0001
+        lr = 0.001
         
     elif mode == 'full':
-        print("Configuring: Full Fine-Tuning (ImageNet Weights)...")
+        print("Full Fine-tuning: Pretrained ResNet-152")
         weights = models.ResNet152_Weights.IMAGENET1K_V2
         model = models.resnet152(weights=weights)
+        model.fc = nn.Linear(2048, num_classes)
+
+        # Enable all gradients
         for p in model.parameters():
             p.requires_grad = True
-        model.fc = nn.Linear(2048, num_classes)
         lr = 0.0001
         
     elif mode == 'lastblock':
-        print("Configuring: Last Block Fine-Tuning...")
+        print("Last Block Fine-tuning: Freeze layers 1-3")
         weights = models.ResNet152_Weights.IMAGENET1K_V2
         model = models.resnet152(weights=weights)
+        model.fc = nn.Linear(2048, num_classes)
+
+        # Freeze layers 1-3
         for name, p in model.named_parameters():
             if 'layer4' in name or 'fc' in name:
                 p.requires_grad = True
             else:
                 p.requires_grad = False
-        model.fc = nn.Linear(2048, num_classes)
-        lr = 0.0001
+        lr = 0.001
     
     else:
         raise ValueError(f"Unknown mode: {mode}")
@@ -82,22 +89,47 @@ def main():
 
     DEVICE = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
     print(f"Using Device: {DEVICE}")
+    
+    train_transform = transforms.Compose([
+        transforms.Resize(96),
+        transforms.RandomCrop(96, padding=4),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+        transforms.Normalize((0.4914,0.4822,0.4465), (0.2023,0.1994,0.2010))
+    ])
+    val_transform = transforms.Compose([
+        transforms.Resize(96),
+        transforms.ToTensor(),
+        transforms.Normalize((0.4914,0.4822,0.4465), (0.2023,0.1994,0.2010))
+    ])
 
-    print("Loading CIFAR-10...")
-    weights = models.ResNet152_Weights.IMAGENET1K_V2
-    preprocess = weights.transforms()
+
+    print("Loading CIFAR-10 (Stratified Subset)...")
+    train_full = datasets.CIFAR10(root='./data', train=True, download=True, transform=train_transform)
+    val_full = datasets.CIFAR10(root='./data', train=True, download=True, transform=val_transform)
     
-    full_train = datasets.CIFAR10(root='./data', train=True, download=True, transform=preprocess)
-    train_data, val_data = random_split(full_train, [45000, 5000], generator=torch.Generator().manual_seed(42))
+    # perform stratified split
+    targets = train_full.targets
+    train_idx, val_idx = train_test_split(
+        np.arange(len(targets)),
+        test_size=1000,
+        train_size=4000,
+        random_state=42,
+        stratify=targets
+    )
     
+    # create subsets
+    # train_full (augmented) for training indices
+    train_data = Subset(train_full, train_idx)
+    # val_full (clean) for validation indices
+    val_data = Subset(val_full, val_idx)
+
     train_loader = DataLoader(train_data, batch_size=32, shuffle=True, num_workers=2)
     val_loader = DataLoader(val_data, batch_size=32, shuffle=False, num_workers=2)
 
-    # Model Setup
     model, lr = get_model(args.mode, num_classes=10)
     model = model.to(DEVICE)
 
-    # Optimizer (Only optimize parameters that require grad)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=lr)
 
@@ -105,7 +137,7 @@ def main():
 
     print(f"\nStarting Training ({args.mode} mode)...")
     for epoch in range(args.epochs):
-        train_loss, train_acc = train_one_epoch(model, train_loader, criterion, optimizer, DEVICE)
+        train_loss, train_acc = train_one_epoch(model, train_loader, criterion, optimizer, DEVICE, accumulation_steps=4)
         val_loss, val_acc = evaluate(model, val_loader, criterion, DEVICE)
         
         history['train_loss'].append(train_loss)
@@ -114,12 +146,10 @@ def main():
         history['val_acc'].append(val_acc)
         print(f"Epoch {epoch+1}/{args.epochs}")
 
-    # Save results
     os.makedirs('results', exist_ok=True)
     output_file = f'results/{args.mode}_metrics.json'
     with open(output_file, 'w') as f:
         json.dump(history, f)
-    
     print(f"\nTraining complete. Results saved to {output_file}")
 
 if __name__ == '__main__':
