@@ -13,7 +13,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torchvision import datasets, models
 from torch.utils.data import DataLoader, random_split
-from utils import train_one_epoch, evaluate
+from utils_update import train_one_epoch, evaluate
 
 
 class BottleneckNoSkip(nn.Module):
@@ -66,32 +66,29 @@ def main():
     for idx in [0, 1, 2]:
         model.layer4[idx] = BottleneckNoSkip(model.layer4[idx])
     
-    # Freeze all except layer4 and fc
-    for name, param in model.named_parameters():
-        if 'layer4' not in name and 'fc' not in name:
-            param.requires_grad = False
+    # Freeze all parameters like baseline for comparison
+    for param in model.parameters():
+        param.requires_grad = False
     
     model.fc = nn.Linear(2048, 10)
     model = model.to(DEVICE)
 
-    # Data
     print("Preparing Data...")
     preprocess = weights.transforms()
     full_train = datasets.CIFAR10(root='./data', train=True, download=True, transform=preprocess)
     train_data, val_data = random_split(full_train, [45000, 5000], generator=torch.Generator().manual_seed(42))
     
-    train_loader = DataLoader(train_data, batch_size=64, shuffle=True, num_workers=2)
-    val_loader = DataLoader(val_data, batch_size=64, shuffle=False, num_workers=2)
+    train_loader = DataLoader(train_data, batch_size=64, shuffle=True, num_workers=4)
+    val_loader = DataLoader(val_data, batch_size=64, shuffle=False, num_workers=4)
 
     # Training
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.001)
-    
+    optimizer = optim.Adam(model.fc.parameters(), lr=0.001)    
     history = {'train_loss': [], 'train_acc': [], 'val_loss': [], 'val_acc': []}
 
     print("Starting Training...")
     for epoch in range(5):
-        train_loss, train_acc = train_one_epoch(model, train_loader, criterion, optimizer, DEVICE)
+        train_loss, train_acc = train_one_epoch(model, train_loader, criterion, optimizer, DEVICE, accumulation_steps=4)
         val_loss, val_acc = evaluate(model, val_loader, criterion, DEVICE)
         
         history['train_loss'].append(train_loss)
@@ -102,9 +99,9 @@ def main():
 
     # Save results
     os.makedirs('results', exist_ok=True)
-    with open('results/broken_metrics.json', 'w') as f:
+    with open('results/broken_metrics2.json', 'w') as f:
         json.dump(history, f)
-    print("\nTraining complete. Metrics saved to results/broken_metrics.json")
+    print("\nTraining complete. Metrics saved to results/broken_metrics2.json")
 
     # Save model
     # torch.save(model.state_dict(), "checkpoints/resnet_broken.pth")
