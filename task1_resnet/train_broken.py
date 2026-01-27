@@ -99,9 +99,9 @@ def main():
 
     # Save results
     os.makedirs('results', exist_ok=True)
-    with open('results/broken_metrics2.json', 'w') as f:
+    with open('results/broken_metrics.json', 'w') as f:
         json.dump(history, f)
-    print("\nTraining complete. Metrics saved to results/broken_metrics2.json")
+    print("\nTraining complete. Metrics saved to results/broken_metrics.json")
 
     # Save model
     # torch.save(model.state_dict(), "checkpoints/resnet_broken.pth")
