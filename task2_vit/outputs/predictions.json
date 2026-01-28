@@ -1,0 +1,10 @@
+{
+  "dog.jpg": {
+    "top1_label": "Labrador retriever",
+    "top1_probability": 0.9562602043151855
+  },
+  "car.jpg": {
+    "top1_label": "sports car, sport car",
+    "top1_probability": 0.6392867565155029
+  }
+}
