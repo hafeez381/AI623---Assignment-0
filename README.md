@@ -1,4 +1,4 @@
-# AI623 - Deep Vision and Language Models: Assignment 0
+# AI623 - Deep Vision-Language Models: Assignment 0
 
 This repository contains implementations for Assignment 0 of the Deep Vision-Language Models course (AI623) at LUMS, Pakistan. The assignment explores four fundamental deep learning architectures for computer vision.
 
