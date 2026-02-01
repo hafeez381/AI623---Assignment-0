@@ -29,12 +29,32 @@ Explores zero-shot classification on STL-10 and analyzes the alignment between i
 
 ## Requirements
 
-- Python 3.8+
-- PyTorch
-- torchvision
-- transformers (for ViT)
-- clip (OpenAI)
-- numpy, scikit-learn, matplotlib, tqdm
+This project was developed and tested using **Python 3.11.14**. To ensure reproducibility of the experiments (especially the CLIP modality gap visualizations and VAE training), we recommend setting up a virtual environment using one of the following two methods:
+
+### Option A: Conda (Recommended)
+This is the preferred method as the `environment.yml` file captures the specific Python version and handles complex dependencies (like `umap-learn` and `pytorch` for Mac MPS/Silicon) more reliably.
+
+```bash
+# Create the environment from the provided yml file
+conda env create -f environment.yml
+
+# Activate the environment
+conda activate pa5
+```
+
+### Option B: Pip
+If you are not using Conda, you can use the `requirements.txt` file with a standard Python virtual environment.
+
+```bash
+# Create a virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows use: venv\Scripts\activate
+
+# Install all dependencies
+pip install -r requirements.txt
+```
+
+[!IMPORTANT] Note on CLIP: Both configuration files are set to install the CLIP library directly from OpenAI's official GitHub repository. Ensure that Git is installed on your system, as pip will need it to clone the model code during the installation process.
 
 ## Quick Start
 
