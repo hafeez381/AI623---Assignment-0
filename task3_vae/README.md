@@ -2,7 +2,7 @@
 
 This task implements and trains a Variational Autoencoder on FashionMNIST, investigating posterior collapse and implementing KL annealing as mitigation.
 
-## 📁 Files
+## Files
 
 | File | Description |
 |------|-------------|
@@ -11,7 +11,7 @@ This task implements and trains a Variational Autoencoder on FashionMNIST, inves
 | `train_vae.py` | Training script with baseline and mitigated modes |
 | `analysis_vae.ipynb` | Comprehensive analysis notebook |
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 Encoder: Input(784) → Linear(400) → ReLU → [μ(20), σ(20)]
@@ -19,7 +19,7 @@ Encoder: Input(784) → Linear(400) → ReLU → [μ(20), σ(20)]
 Decoder: z(20) → Linear(400) → ReLU → Linear(784) → Sigmoid
 ```
 
-## 🔬 Training Modes
+## Training Modes
 
 ### Baseline (Standard VAE)
 ```bash
@@ -35,12 +35,12 @@ Implements KL annealing to prevent posterior collapse:
 - β linearly increases from 0 to 1 over the first 50% of training
 - Allows encoder to learn meaningful features before regularization
 
-## 📊 Outputs
+## Outputs
 
 - `models/`: Saved model weights (`vae_baseline.pth`, `vae_mitigated.pth`)
 - `outputs/losses/`: Training history JSON files
 
-## 📓 Analysis
+## Analysis
 
 Open `analysis_vae.ipynb` to:
 - Visualize reconstructions vs. originals

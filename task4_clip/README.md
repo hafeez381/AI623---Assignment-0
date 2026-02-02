@@ -2,14 +2,14 @@
 
 This task explores OpenAI's CLIP model for zero-shot classification and analyzes the alignment between image and text embeddings.
 
-## 📁 Files
+## Files
 
 | File | Description |
 |------|-------------|
 | `clip_utils.py` | Utility functions for CLIP: zero-shot classification, feature extraction, alignment |
 | `analysis_clip.ipynb` | Comprehensive analysis notebook |
 
-## 🔧 Key Functions
+## Key Functions
 
 ### `clip_utils.py`
 - `load_clip_model()` - Load CLIP ViT-B/32 model
@@ -19,7 +19,7 @@ This task explores OpenAI's CLIP model for zero-shot classification and analyzes
 - `extract_features()` - Extract image and text embeddings
 - `align_embeddings()` - Procrustes alignment between modalities
 
-## 🔬 Experiments
+## Experiments
 
 All experiments are conducted in the analysis notebook:
 
@@ -39,11 +39,11 @@ Test different templates:
 - Visualize in 2D using t-SNE
 - Apply Procrustes alignment to study modality gap
 
-## 📊 Outputs
+## Outputs
 
 - `outputs/`: Saved embeddings and alignment results
 
-## 📓 Analysis
+## Analysis
 
 Open `analysis_clip.ipynb` to:
 - Evaluate zero-shot accuracy on STL-10

@@ -2,7 +2,7 @@
 
 This task explores the Vision Transformer architecture through attention visualization, patch masking experiments, and linear probe training.
 
-## 📁 Files
+## Files
 
 | File | Description |
 |------|-------------|
@@ -12,7 +12,7 @@ This task explores the Vision Transformer architecture through attention visuali
 | `train_linear_probe.py` | Train linear classifier on frozen ViT features |
 | `analysis_vit.ipynb` | Comprehensive analysis notebook |
 
-## 🔧 Key Functions
+## Key Functions
 
 ### `vit_utils.py`
 - `load_model()` - Load pretrained ViT-Base-Patch16-224
@@ -21,7 +21,7 @@ This task explores the Vision Transformer architecture through attention visuali
 - `mask_patches()` - Apply random or center masking to images
 - `get_patch_embeddings()` - Extract embeddings for linear probe
 
-## 🔬 Experiments
+## Experiments
 
 ### Inference
 ```bash
@@ -40,12 +40,12 @@ python train_linear_probe.py
 ```
 Trains a linear classifier on frozen ViT features to evaluate representation quality.
 
-## 📊 Outputs
+## Outputs
 
 - `outputs/`: Saved embeddings and metrics
 - `figures/`: Attention maps and visualizations
 
-## 📓 Analysis
+## Analysis
 
 Open `analysis_vit.ipynb` to:
 - Visualize CLS token attention maps

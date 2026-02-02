@@ -2,7 +2,7 @@
 
 This task explores the ResNet-152 architecture through transfer learning experiments and skip connection analysis on CIFAR-10.
 
-## 📁 Files
+## Files
 
 | File | Description |
 |------|-------------|
@@ -13,7 +13,7 @@ This task explores the ResNet-152 architecture through transfer learning experim
 | `utils_update.py` | Updated utilities with gradient accumulation |
 | `visualization.ipynb` | Comprehensive analysis notebook |
 
-## 🔬 Experiments
+## Experiments
 
 ### Task 1.1: Baseline (Frozen Backbone)
 ```bash
@@ -39,13 +39,13 @@ python train_transfer.py --mode full
 python train_transfer.py --mode lastblock
 ```
 
-## 📊 Outputs
+## Outputs
 
 - `results/`: Training metrics (JSON)
 - `checkpoints/`: Saved model weights
 - `figures/`: Generated visualizations
 
-## 📓 Analysis
+## Analysis
 
 Open `visualization.ipynb` to:
 - Plot training curves
